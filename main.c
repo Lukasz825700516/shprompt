@@ -67,27 +67,29 @@ int git_repo_prompt(git_buf* repo_root) {
 
 	git_repository *repo;
 	if (git_repository_open(&repo, "./")) {
-		fprintf(stderr, "Failed to get repo!\n");
-		exit(EXIT_FAILURE);
+		// Current directory is not in any git repo
+
+		return EXIT_FAILURE;
 	}
 
 	git_reference *ref;
 	if (git_repository_head(&ref, repo)) {
-		fprintf(stderr, "Failed to get ref!\n");
-		exit(EXIT_FAILURE);
+		// HEAD is not set? Create initial commit!
+
+		return EXIT_FAILURE;
+
+	} else {
+		const char* branch_name;
+		git_branch_name(&branch_name, ref);
+
+		size_t branch_name_width = strlen(branch_name);
+
+		int repo_name_width = (repo_name.str_end - repo_name.str);
+		printf("%.*s%.*s%s\n", repo_name_width, repo_name.str, dimensions.ws_col - repo_name_width - (int)branch_name_width, padding, branch_name);
+
+
+		git_reference_free(ref);
 	}
-
-
-	const char* branch_name;
-	git_branch_name(&branch_name, ref);
-
-	size_t branch_name_width = strlen(branch_name);
-
-	int repo_name_width = (repo_name.str_end - repo_name.str);
-	printf("%.*s%.*s%s\n", repo_name_width, repo_name.str, dimensions.ws_col - repo_name_width - (int)branch_name_width, padding, branch_name);
-
-
-	git_reference_free(ref);
 
 	return 0;
 }
@@ -97,10 +99,11 @@ int main() {
 
 
 	const char* user = getenv("USER");
-	const char* directory = getenv("PWD");
+	char* directory = getcwd(0, 0);
 	git_buf repo_root = {0};
 	char host[HOST_NAME_MAX + 1];
 	struct str_span directory_span = shprompt_get_directory(directory);
+
 
 
 	gethostname(host, HOST_NAME_MAX + 1);
@@ -121,5 +124,7 @@ int main() {
 
 	git_buf_free(&repo_root);
 	git_libgit2_shutdown();
+
+	free(directory);
 	return 0;
 }
