@@ -1,7 +1,6 @@
 PROGNAME = shprompt
-CFLAGS=
 LDFLAGS = $(shell pkg-config --libs libgit2)
-CFLAGS = $(shell pkg-config --cflags libgit2)
+CFLAGS = $(shell pkg-config --cflags libgit2) -O3
 OBJECTS = \
 	main.o
 

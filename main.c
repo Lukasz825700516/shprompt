@@ -111,7 +111,7 @@ int main() {
 	git_libgit2_init();
 
 	git_repo_prompt(directory);
-	printf("%s@%s %.*s $ ", user, host, (int)(directory_span.str_end - directory_span.str), directory_span.str);
+	printf("\\[\e[32m\\]%s\\[\e[0m\\]@\\[\e[31m\\]%s\\[\e[0m\\] %.*s \\[\e[32m\\]\$\\[\e[0m\\] ", user, host, (int)(directory_span.str_end - directory_span.str), directory_span.str);
 
 	git_libgit2_shutdown();
 
